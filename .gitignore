@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.idea
+/deadflask/client/node_modules
+/deadflask/config.json
+/deadflask/client/.editorconfig
