@@ -6,6 +6,7 @@ class DeadFlaskApp(Flask):
     def __init__(self):
         super().__init__(__name__)
         self.config["DEBUG"] = True
+        self.db_session = None
 
 
 app = DeadFlaskApp()
