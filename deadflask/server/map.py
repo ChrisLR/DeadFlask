@@ -22,9 +22,13 @@ def get_map():
         Building.type == BuildingType.id
     ).order_by(Building.coord_y, Building.coord_x)
 
-    result = [
-        {'name': row.Building.name, 'type': row.BuildingType.name, 'coordinates': (row.Building.coord_x, row.Building.coord_y)}
-        for row in rows
-    ]
+    rows = list(rows)
+    result_rows = []
+    while rows:
+        current_row = []
+        for _ in range(10):
+            row = rows.pop(0)
+            current_row.append({'name': row.Building.name, 'type': row.BuildingType.name})
+        result_rows.append(current_row)
 
-    return jsonify(result)
+    return jsonify(result_rows)
