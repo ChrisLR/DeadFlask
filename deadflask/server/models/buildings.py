@@ -13,6 +13,7 @@ class BuildingType(Base):
     height = Column(Integer, default=1)
     has_outside_doors = Column(Boolean, default=True)
     has_inside_doors = Column(Boolean, default=False)
+    has_inside = Column(Boolean, default=True)
     max_per_city = Column(Integer, default=-1)
     buildings = relationship("Building")
 
@@ -26,13 +27,22 @@ class BuildingType(Base):
 class Building(Base):
     __tablename__ = "buildings"
 
+    # Identity Fields
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    description = Column(String)
+    city = Column(Integer, ForeignKey('cities.id'))
     coord_x = Column(Integer)
     coord_y = Column(Integer)
-    city = Column(Integer, ForeignKey('cities.id'))
+    description = Column(String)
     type = Column(Integer, ForeignKey('building_types.id'))
+
+    # Current State Fields
+    barricade_level = Column(Integer)
+    doors_open = Column(Boolean, default=False)
+    inside_blood_level = Column(Integer)
+    outside_blood_level = Column(Integer)
+    power_level = Column(Integer)
+    ruin_level = Column(Integer)
 
     _index_coords = Index('idx_coordinates', coord_x, coord_y)
     _unq_name_city = UniqueConstraint(name, city)

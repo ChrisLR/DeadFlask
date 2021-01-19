@@ -18,7 +18,7 @@ building_types = [
     BuildingType(name="Public House"),
     BuildingType(name="Railway Station"),
     BuildingType(name="School"),
+    BuildingType(name="Street", has_inside=False),
     BuildingType(name="Tower"),
     BuildingType(name="Warehouse"),
 ]
-
