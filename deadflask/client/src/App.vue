@@ -5,6 +5,7 @@
 </template>
 
 <style>
+@import './assets/buildingstyles.css';
 #app {
   margin-top: 60px
 }

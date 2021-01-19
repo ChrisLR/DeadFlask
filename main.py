@@ -17,5 +17,6 @@ if __name__ == '__main__':
     preloaded_data = preload_data(session)
     #create_city(session, preloaded_data)
     app.db_session = session
+    app.app_config = config
 
     app.run()
