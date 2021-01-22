@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import fetchBuildingsMap from '../api/buildings';
+import { fetchBuildingsMap, moveTo } from '../api/index';
 
 Vue.use(Vuex);
 
@@ -13,8 +13,10 @@ const state = {
 const actions = {
   // asynchronous operations
   loadBuildingsMap(context) {
-    return fetchBuildingsMap()
-      .then((data) => context.commit('setBuildingsMap', data));
+    return fetchBuildingsMap().then((response) => context.commit('setBuildingsMap', response.data));
+  },
+  moveToBuilding(context, { buildingId }) {
+    return moveTo(buildingId).then((response) => context.commit('setBuildingsMap', response.data));
   },
 };
 
