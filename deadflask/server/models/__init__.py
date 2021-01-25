@@ -1,1 +1,1 @@
-from deadflask.server.models import buildings, cities
+from deadflask.server.models import buildings, cities, user

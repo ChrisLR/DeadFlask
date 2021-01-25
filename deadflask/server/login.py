@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import flask
+from flask_cors import cross_origin
 import jwt
 
 from deadflask.server.app import app
@@ -24,7 +25,7 @@ def post_login():
         'exp': datetime.utcnow() + timedelta(minutes=30)
     }
     token = jwt.encode(key=app.app_config['secret_key'], payload=token_payload)
-    response = {'message': "OK", 'token': token.decode('UTF-8')}
+    response = {'message': "OK", 'token': token}
 
     return flask.jsonify(response)
 

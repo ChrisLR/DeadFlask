@@ -13,7 +13,7 @@ class DeadFlaskApp(Flask):
 app = DeadFlaskApp()
 
 # enable CORS
-CORS(app, resources={r'/*': {'origins': 'http://localhost:8080'}})
+CORS(app, resources=r'/*', origins=['http://localhost:8080'], supports_credentials=True)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 

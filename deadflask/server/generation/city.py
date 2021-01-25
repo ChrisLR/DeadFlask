@@ -1,8 +1,10 @@
+import random
+
+import faker
+
 from deadflask.server.data.buildingtypes import building_types
 from deadflask.server.models.buildings import BuildingType, Building
 from deadflask.server.models.cities import City
-import faker
-import random
 
 
 def preload_data(session):

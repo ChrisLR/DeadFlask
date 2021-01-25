@@ -19,18 +19,20 @@ class User(Base):
         if not email or not password:
             return None
 
-        user = app.db_session.query(cls).filter_by(email=email).one_or_none()
-
-        if not user or not bcrypt.checkpw(password, user.password):
+        user = app.db_session.query(User).filter_by(email=email).one_or_none()
+        encoded_password = password.encode('utf-8')
+        encoded_db_password = user.password.encode('utf-8')
+        if not user or not bcrypt.checkpw(encoded_password, encoded_db_password):
             return None
 
         return user
 
     @classmethod
     def create(cls, app, email, name, password):
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password, salt)
-        new = User(email=email, name=name, password=str(hashed_password), salt=str(salt))
+        hashed_password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+        decoded_password = hashed_password.decode('utf8')
+        # TODO No need to store salt?
+        new = User(email=email, name=name, password=str(decoded_password))
         app.db_session.add(new)
 
         return new

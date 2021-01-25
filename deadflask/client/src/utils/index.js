@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 
-const loginUrl = 'http://localhost:5000/login/';
+const loginUrl = 'http://localhost:5000/login';
 
 export const EventBus = new Vue();
 
