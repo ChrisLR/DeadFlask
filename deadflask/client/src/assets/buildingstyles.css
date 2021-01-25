@@ -1,18 +1,19 @@
-.Bank{}
-.Building{}
-.Church{}
+.Bank{background-color: rgb(221, 238, 221);}
+.Building{background-color: rgb(170, 170, 221);}
+.Church{background-color: rgb(255, 255, 255);}
 .Cinema{background-color: rgb(221, 221, 221);}
 .Club{}
 .Factory{}
 .Fire_Station{}
 .Hospital{}
-.Hotel{}
+.Hotel{background-color: rgb(204, 153, 68);}
 .Junkyard{}
 .Library{}
-.Museum{}
+.Museum{background-color: rgb(136, 153, 136);}
+.Park{background-color: rgb(153, 204, 153);}
 .Police_Department{background-color: rgb(221, 221, 255);}
 .Public_House{}
 .Railway_Station{}
-.School{}
+.School{background-color: rgb(136, 153, 153);}
 .Tower{}
 .Warehouse{background-color: rgb(153, 136, 119);}
