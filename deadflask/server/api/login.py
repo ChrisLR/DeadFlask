@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import flask
-from flask_cors import cross_origin
 import jwt
 
 from deadflask.server.app import app
@@ -28,4 +27,3 @@ def post_login():
     response = {'message': "OK", 'token': token}
 
     return flask.jsonify(response)
-

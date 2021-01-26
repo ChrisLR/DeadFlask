@@ -1,1 +1,1 @@
-from deadflask.server import map, login
+from deadflask.server import api

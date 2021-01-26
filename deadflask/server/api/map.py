@@ -58,4 +58,3 @@ def move_to():
     result_rows = _get_map(building.coord_x, building.coord_y, building.city)
 
     return jsonify(result_rows)
-
