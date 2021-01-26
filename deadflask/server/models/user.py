@@ -9,9 +9,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True)
-    name = Column(String)
     password = Column(String)
-    salt = Column(String)
     is_active = Column(Boolean, default=False)
 
     @classmethod
@@ -28,11 +26,10 @@ class User(Base):
         return user
 
     @classmethod
-    def create(cls, app, email, name, password):
+    def create(cls, app, email, password):
         hashed_password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
         decoded_password = hashed_password.decode('utf8')
-        # TODO No need to store salt?
-        new = User(email=email, name=name, password=str(decoded_password))
+        new = User(email=email, password=str(decoded_password))
         app.db_session.add(new)
 
         return new

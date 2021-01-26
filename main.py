@@ -5,7 +5,8 @@ from deadflask.server import dbcore
 # noinspection PyUnresolvedReferences
 from deadflask.server import models
 from deadflask.server.app import app
-from deadflask.server.generation.city import preload_data, create_city
+from deadflask.server.generation.city import create_city
+from deadflask.server.generation.preloading import preload_data
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__), "deadflask/config.json")
