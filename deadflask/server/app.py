@@ -8,6 +8,7 @@ class DeadFlaskApp(Flask):
         self.config["DEBUG"] = True
         self.db_session = None
         self.app_config = None
+        self.preloaded_data = None
 
 
 app = DeadFlaskApp()

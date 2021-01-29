@@ -2,10 +2,12 @@ from flask import request, jsonify
 
 from deadflask.server.app import app
 from deadflask.server.models.buildings import Building, BuildingType
+from deadflask.server.auth import require_user
 
 
 @app.route('/map', methods=['GET'])
-def get_map():
+@require_user
+def get_map(user):
     coordinates = request.args.get('coordinates', (0, 0))
     city = request.args.get('city', 2)
     cx, cy = coordinates
@@ -48,7 +50,8 @@ def _get_map(cx, cy, city):
 
 
 @app.route('/move_to', methods=['POST'])
-def move_to():
+@require_user
+def move_to(user):
     post_data = request.get_json()
     building_id = post_data.get('building_id', 1)
     building = app.db_session.query(Building).filter(

@@ -21,6 +21,7 @@
 import { mapState } from 'vuex';
 
 export default {
+  name: 'CharacterMap',
   computed: mapState({
     buildingsMap: (state) => state.buildingsMap,
   }),

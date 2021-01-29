@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey
-from sqlalchemy.orm import relationship
 
 from deadflask.server.dbcore import Base
+from deadflask.server.models.cities import City
 
 
 class CharacterType(Base):
@@ -19,28 +19,38 @@ class Character(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
     city = Column(Integer, ForeignKey('cities.id'))
-    coord_x = Column(Integer)
-    coord_y = Column(Integer)
-    type = relationship("CharacterType")
-    user = relationship("User")
+    coord_x = Column(Integer, default=0)
+    coord_y = Column(Integer, default=0)
+    type = Column(Integer, ForeignKey('character_types.id'))
+    user = Column(Integer, ForeignKey('users.id'))
 
     # Current State Fields
-    health = Column(Integer)
-    experience = Column(Integer)
+    health = Column(Integer, default=50)
+    experience = Column(Integer, default=0)
     is_bot = Column(Boolean, default=False)
     is_inside = Column(Boolean, default=False)
 
     # TODO Inventory
     # TODO Message Log
 
-    _index_coords = Index('idx_coordinates', coord_x, coord_y)
+    _index_coords = Index('idx_character_coordinates', coord_x, coord_y)
 
     @classmethod
-    def create(cls, name, character_type, user=None):
+    def create(cls, app, name, character_type, user=None):
+        city = app.db_session.query(City).first()
         if user:
-            return Character(name=name, type=character_type, user=user)
+            character = Character(name=name, type=character_type.id, user=user.id, city=city.id)
         else:
-            return Character(name=name, type=character_type, is_bot=True)
+            character = Character(name=name, type=character_type.id, is_bot=True, city=city.id)
+
+        app.db_session.add(character)
+
+        return character
+
+    @classmethod
+    def exists(cls, app, name):
+        character = app.db_session.query(Character).filter_by(name=name).one_or_none()
+        return bool(character)
 
     def __repr__(self):
         if self.is_bot:

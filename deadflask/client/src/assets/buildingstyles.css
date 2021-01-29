@@ -2,18 +2,19 @@
 .Building{background-color: rgb(170, 170, 221);}
 .Church{background-color: rgb(255, 255, 255);}
 .Cinema{background-color: rgb(221, 221, 221);}
-.Club{}
-.Factory{}
-.Fire_Station{}
-.Hospital{}
+.Club{background-color: rgb(204, 153, 204);}
+.Factory{background-color: rgb(170, 170, 170);}
+.Fire_Station{background-color: rgb(255, 221, 221);}
+.Hospital{background-color: rgb(255, 153, 153);}
 .Hotel{background-color: rgb(204, 153, 68);}
-.Junkyard{}
+.Junkyard{background-color: rgb(119, 102, 85);}
 .Library{}
+.Motel{background-color: rgb(204, 153, 68);}
 .Museum{background-color: rgb(136, 153, 136);}
 .Park{background-color: rgb(153, 204, 153);}
 .Police_Department{background-color: rgb(221, 221, 255);}
-.Public_House{}
-.Railway_Station{}
+.Public_House{background-color: rgb(136, 119, 102);}
+.Railway_Station{background-color: rgb(136, 136, 136);}
 .School{background-color: rgb(136, 153, 153);}
-.Tower{}
+.Tower{background-color: rgb(238, 238, 238);}
 .Warehouse{background-color: rgb(153, 136, 119);}

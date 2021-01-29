@@ -2,15 +2,20 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { isValidJwt, EventBus } from '../utils';
-import { fetchBuildingsMap, moveTo, authenticate } from '../api/index';
+import {
+  fetchBuildingsMap, moveTo, authenticate, fetchCharacterInfo,
+} from '../api/index';
 
 Vue.use(Vuex);
 
 const state = {
   // single source of data
   buildingsMap: [],
+  character: {},
+  characterId: -1,
   user: {},
   jwt: '',
+  token: '',
 };
 
 const actions = {
@@ -29,6 +34,10 @@ const actions = {
         EventBus.$emit('failedAuthentication', error);
       });
   },
+  loadCharacterInfo(context) {
+    return fetchCharacterInfo(context.state.characterId)
+      .then((response) => context.commit('setCharacterInfo', response.data));
+  },
 };
 
 const mutations = {
@@ -36,19 +45,36 @@ const mutations = {
   setBuildingsMap(state, data) {
     state.buildingsMap = data;
   },
+  setCharacterInfo(state, data) {
+    state.character = data;
+  },
+  setCharacterId(state, data) {
+    state.characterId = data;
+    localStorage.setItem('characterId', data);
+  },
   setUserData(state, payload) {
     state.userData = payload.userData;
   },
   setJwtToken(state, payload) {
-    localStorage.token = payload.jwt.token;
+    localStorage.setItem('token', payload.jwt.token);
     state.jwt = payload.jwt;
+    state.token = payload.jwt.token;
+  },
+  initialiseStore(state) {
+    const token = localStorage.getItem('token');
+    if (token) { state.token = token; }
+    const characterId = localStorage.getItem('characterId');
+    if (characterId) { state.characterId = characterId; }
   },
 };
 
 const getters = {
   // reusable data accessors
   isAuthenticated(state) {
-    return isValidJwt(state.jwt.token);
+    return isValidJwt(state.token);
+  },
+  hasChosenCharacter(state) {
+    return state.characterId > -1;
   },
 };
 

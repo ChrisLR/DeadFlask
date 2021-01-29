@@ -45,7 +45,7 @@ export default {
   methods: {
     authenticate() {
       this.$store.dispatch('login', { email: this.email, password: this.password })
-        .then(() => this.$router.push('/map'));
+        .then(() => this.$router.push('/'));
     },
   },
   mounted() {

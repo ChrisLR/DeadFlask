@@ -16,6 +16,7 @@ if __name__ == '__main__':
     db_config = config["db_config"]
     session = dbcore.connect_db(db_config)
     preloaded_data = preload_data(session)
+    app.preloaded_data = preloaded_data
     #create_city(session, preloaded_data)
     app.db_session = session
     app.app_config = config

@@ -1,5 +1,6 @@
 import bcrypt
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 from deadflask.server.dbcore import Base
 
@@ -11,6 +12,7 @@ class User(Base):
     email = Column(String, unique=True)
     password = Column(String)
     is_active = Column(Boolean, default=False)
+    characters = relationship('Character')
 
     @classmethod
     def authenticate(cls, app, email, password):
