@@ -1,9 +1,10 @@
-import flask
 import logging
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+import flask
+from sqlalchemy.exc import IntegrityError
 
 from deadflask.server import auth
-from deadflask.server.api import validation
+from deadflask.server.api import validation, map
 from deadflask.server.app import app
 from deadflask.server.models.characters import Character, CharacterType
 
@@ -98,3 +99,18 @@ def get_character_types(user):
     }
 
     return flask.jsonify(response)
+
+
+@app.route('/character/<int:character_id>/map', methods=['GET'])
+@auth.require_user
+def get_character_map(user, character_id):
+    character = app.db_session.query(Character).get(character_id)
+    if not character:
+        return flask.jsonify({'message': 'Unknown character id'}), 400
+
+    if character.user != user.id:
+        return flask.jsonify({'message': 'Invalid character id'}), 400
+
+    result_rows = map.get_map(character.coord_x, character.coord_y, character.city)
+
+    return flask.jsonify(result_rows)

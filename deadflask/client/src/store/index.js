@@ -21,10 +21,12 @@ const state = {
 const actions = {
   // asynchronous operations
   loadBuildingsMap(context) {
-    return fetchBuildingsMap().then((response) => context.commit('setBuildingsMap', response.data));
+    return fetchBuildingsMap(context.state.characterId)
+      .then((response) => context.commit('setBuildingsMap', response.data));
   },
   moveToBuilding(context, { buildingId }) {
-    return moveTo(buildingId).then((response) => context.commit('setBuildingsMap', response.data));
+    return moveTo(buildingId, context.state.characterId)
+      .then((response) => context.commit('setBuildingsMap', response.data));
   },
   login(context, userData) {
     context.commit('setUserData', { userData });

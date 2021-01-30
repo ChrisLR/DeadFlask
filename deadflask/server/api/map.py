@@ -1,22 +1,22 @@
-from flask import request, jsonify
+import flask
+import logging
+from sqlalchemy.exc import SQLAlchemyError
 
+from deadflask.server.api import validation
 from deadflask.server.app import app
-from deadflask.server.models.buildings import Building, BuildingType
 from deadflask.server.auth import require_user
+from deadflask.server.models.buildings import Building, BuildingType
+from deadflask.server.models.characters import Character
+
+_move_to_fields = (
+    validation.ValidatedField('building_id', int),
+    validation.ValidatedField('character_id', int),
+)
+
+_logger = logging.getLogger()
 
 
-@app.route('/map', methods=['GET'])
-@require_user
-def get_map(user):
-    coordinates = request.args.get('coordinates', (0, 0))
-    city = request.args.get('city', 2)
-    cx, cy = coordinates
-    result_rows = _get_map(cx, cy, city)
-
-    return jsonify(result_rows)
-
-
-def _get_map(cx, cy, city):
+def get_map(cx, cy, city):
     # Just some quick validation, make something better
     if cx < 0 or cy < 0 or cx > 20000 or cy > 20000:
         cx = 0
@@ -52,12 +52,30 @@ def _get_map(cx, cy, city):
 @app.route('/move_to', methods=['POST'])
 @require_user
 def move_to(user):
-    post_data = request.get_json()
-    building_id = post_data.get('building_id', 1)
-    building = app.db_session.query(Building).filter(
-        Building.id == building_id
-    ).first()
+    post_data = flask.request.get_json()
+    valid_data, invalid_data = validation.validate_post_data(_move_to_fields, post_data)
+    if invalid_data:
+        return flask.jsonify({'message': list(invalid_data.values())}), 400
 
-    result_rows = _get_map(building.coord_x, building.coord_y, building.city)
+    building_id = valid_data['building_id']
+    building = app.db_session.query(Building).get(building_id)
+    if not building:
+        return flask.jsonify({'message': 'Invalid building_id'}), 400
 
-    return jsonify(result_rows)
+    character_id = valid_data['character_id']
+    character = app.db_session.query(Character).get(character_id)
+    if not character:
+        return flask.jsonify({'message': 'Invalid character_id'}), 400
+
+    try:
+        character.coord_x = building.coord_x
+        character.coord_y = building.coord_y
+        app.db_session.commit()
+    except SQLAlchemyError as e:
+        _logger.error(f"Move To Failed: {e}")
+        app.db_session.rollback()
+        return flask.jsonify({'message': 'Server Error'}), 500
+
+    result_rows = get_map(building.coord_x, building.coord_y, building.city)
+
+    return flask.jsonify(result_rows)

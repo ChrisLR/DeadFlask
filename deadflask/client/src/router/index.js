@@ -48,7 +48,7 @@ const router = new Router({
 router.beforeResolve((to, from, next) => {
   if (to.path !== '/login' && !store.getters.isAuthenticated) {
     next({ name: 'Login' });
-  } else if (to.path !== '/log_character' && !store.getters.hasChosenCharacter) {
+  } else if (to.path !== '/log_character' && store.getters.isAuthenticated && !store.getters.hasChosenCharacter) {
     next({ name: 'LogCharacter' });
   } else {
     next();

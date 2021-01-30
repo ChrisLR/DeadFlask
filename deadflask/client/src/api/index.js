@@ -24,14 +24,15 @@ function getHeaders(path) {
   };
 }
 
-export function fetchBuildingsMap() {
-  const path = `${srvPath}/map`;
+export function fetchBuildingsMap(characterId) {
+  const path = `${srvPath}/character/${characterId}/map`;
   return axios.get(path, getHeadersJwt(path));
 }
 
-export function moveTo(buildingId) {
+export function moveTo(buildingId, characterId) {
   const path = `${srvPath}/move_to`;
-  return axios.post(path, { building_id: buildingId }, getHeadersJwt(path));
+  const data = { building_id: buildingId, character_id: characterId };
+  return axios.post(path, data, getHeadersJwt(path));
 }
 
 export function authenticate(userData) {
