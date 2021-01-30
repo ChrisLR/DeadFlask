@@ -7,6 +7,14 @@
             <button type="button" v-on:click="moveTo(building.id)">
               {{ building.name }}
             </button>
+            <div v-if="building.humans.length > 0">
+              <div v-for="human in building.humans" :key="human.id">
+                {{ human.name }}
+              </div>
+            </div>
+            <div v-if="building.zombies.length > 0">
+              {{ building.zombies.length }} zombies
+            </div>
           </div>
           <div v-else>
             !
