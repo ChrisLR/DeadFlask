@@ -37,12 +37,12 @@ class Building(Base):
     type = Column(Integer, ForeignKey('building_types.id'))
 
     # Current State Fields
-    barricade_level = Column(Integer)
+    barricade_level = Column(Integer, default=0)
     doors_open = Column(Boolean, default=False)
-    inside_blood_level = Column(Integer)
-    outside_blood_level = Column(Integer)
-    power_level = Column(Integer)
-    ruin_level = Column(Integer)
+    inside_blood_level = Column(Integer, default=0)
+    outside_blood_level = Column(Integer, default=0)
+    power_level = Column(Integer, default=0)
+    ruin_level = Column(Integer, default=0)
 
     _index_coords = Index('idx_coordinates', coord_x, coord_y)
     _unq_name_city = UniqueConstraint(name, city)

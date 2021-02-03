@@ -1,1 +1,1 @@
-from deadflask.server import api
+from deadflask.server import rest

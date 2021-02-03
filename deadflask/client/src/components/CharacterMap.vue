@@ -1,6 +1,5 @@
 <template>
-  <div class="container">
-    <table class="table table-bordered" style="empty-cells: show;table-layout: fixed;width: 50%;">
+    <table class="table table-bordered" style="empty-cells: show;">
       <tr v-for="(row, ri) in buildingsMap" :key="ri">
        <td v-bind:class="getBuildingStyle(building)" v-for="(building, bi) in row" :key="bi" >
           <div v-if="building" >
@@ -22,7 +21,6 @@
         </td>
       </tr>
     </table>
-  </div>
 </template>
 
 <script>

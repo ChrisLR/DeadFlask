@@ -2,7 +2,7 @@ import flask
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
-from deadflask.server.api import validation
+from deadflask.server.rest import validation
 from deadflask.server.app import app
 from deadflask.server.auth import require_user
 from deadflask.server.models.buildings import Building, BuildingType
@@ -99,5 +99,10 @@ def move_to(user):
         return flask.jsonify({'message': 'Server Error'}), 500
 
     result_rows = get_map(building.coord_x, building.coord_y, building.city)
+    response = {
+        'message': 'OK',
+        'building_id': building.id,
+        'rows': result_rows
+    }
 
-    return flask.jsonify(result_rows)
+    return flask.jsonify(response)

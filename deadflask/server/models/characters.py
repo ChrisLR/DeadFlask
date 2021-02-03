@@ -52,6 +52,18 @@ class Character(Base):
         character = app.db_session.query(Character).filter_by(name=name).one_or_none()
         return bool(character)
 
+    @classmethod
+    def get_at_building(cls, app, building, inside):
+        characters = app.db_session.query(Character).filter(
+            Character.coord_x == building.coord_x,
+            Character.coord_y == building.coord_y,
+            Character.city == building.city,
+            Character.type == CharacterType.id,
+            Character.is_inside == inside
+        )
+
+        return characters
+
     def __repr__(self):
         if self.is_bot:
             return f"<BotCharacter(name='{self.name}')>"

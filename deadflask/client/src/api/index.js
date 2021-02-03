@@ -24,7 +24,7 @@ function getHeaders(path) {
   };
 }
 
-export function fetchBuildingsMap(characterId) {
+export function fetchCharacterMap(characterId) {
   const path = `${srvPath}/character/${characterId}/map`;
   return axios.get(path, getHeadersJwt(path));
 }
@@ -57,5 +57,10 @@ export function fetchCharacterInfo(characterId) {
 
 export function fetchCharacters() {
   const path = `${srvPath}/character`;
+  return axios.get(path, getHeadersJwt(path));
+}
+
+export function fetchCharacterLook(characterId) {
+  const path = `${srvPath}/character/${characterId}/look`;
   return axios.get(path, getHeadersJwt(path));
 }

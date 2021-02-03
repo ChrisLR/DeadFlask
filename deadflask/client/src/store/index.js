@@ -3,13 +3,15 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { isValidJwt, EventBus } from '../utils';
 import {
-  fetchBuildingsMap, moveTo, authenticate, fetchCharacterInfo,
+  fetchCharacterMap, moveTo, authenticate, fetchCharacterInfo, fetchCharacterLook,
 } from '../api/index';
 
 Vue.use(Vuex);
 
 const state = {
   // single source of data
+  building: {},
+  buildingId: -1,
   buildingsMap: [],
   character: {},
   characterId: -1,
@@ -21,12 +23,15 @@ const state = {
 const actions = {
   // asynchronous operations
   loadBuildingsMap(context) {
-    return fetchBuildingsMap(context.state.characterId)
-      .then((response) => context.commit('setBuildingsMap', response.data));
+    return fetchCharacterMap(context.state.characterId)
+      .then((response) => context.commit('setBuildingsMap', response.data))
+      .then(() => context.dispatch('loadCharacterLook'));
   },
   moveToBuilding(context, { buildingId }) {
     return moveTo(buildingId, context.state.characterId)
-      .then((response) => context.commit('setBuildingsMap', response.data));
+      .then((response) => context.commit('setBuildingsMap', response.data))
+      .then(() => context.commit('setBuildingId', buildingId))
+      .then(() => context.dispatch('loadCharacterLook'));
   },
   login(context, userData) {
     context.commit('setUserData', { userData });
@@ -40,12 +45,22 @@ const actions = {
     return fetchCharacterInfo(context.state.characterId)
       .then((response) => context.commit('setCharacterInfo', response.data));
   },
+  loadCharacterLook(context) {
+    return fetchCharacterLook(context.state.characterId)
+      .then((response) => context.commit('setBuildingInfo', response.data));
+  },
 };
 
 const mutations = {
-  // isolated data mutations
+  setBuildingId(state, data) {
+    state.buildingId = data;
+  },
+  setBuildingInfo(state, data) {
+    state.building = data;
+  },
   setBuildingsMap(state, data) {
-    state.buildingsMap = data;
+    state.buildingsMap = data.rows;
+    state.buildingId = data.building_id;
   },
   setCharacterInfo(state, data) {
     state.character = data;

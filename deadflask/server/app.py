@@ -1,3 +1,4 @@
+import inflect
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -9,6 +10,7 @@ class DeadFlaskApp(Flask):
         self.db_session = None
         self.app_config = None
         self.preloaded_data = None
+        self.inflect = inflect.engine()
 
 
 app = DeadFlaskApp()
