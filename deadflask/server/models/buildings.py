@@ -1,6 +1,5 @@
 from deadflask.server.dbcore import Base
 from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship
 
 
 class BuildingType(Base):
@@ -15,7 +14,6 @@ class BuildingType(Base):
     has_inside_doors = Column(Boolean, default=False)
     has_inside = Column(Boolean, default=True)
     max_per_city = Column(Integer, default=-1)
-    buildings = relationship("Building")
 
     def __repr__(self):
         return f"<BuildingType(name='{self.name}')>"
@@ -30,11 +28,11 @@ class Building(Base):
     # Identity Fields
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    city = Column(Integer, ForeignKey('cities.id'))
+    city = Column(Integer, ForeignKey('cities.id'), index=True)
     coord_x = Column(Integer)
     coord_y = Column(Integer)
     description = Column(String)
-    type = Column(Integer, ForeignKey('building_types.id'))
+    type = Column(Integer, ForeignKey('building_types.id'), index=True)
 
     # Current State Fields
     barricade_level = Column(Integer, default=0)

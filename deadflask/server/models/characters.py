@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 class CharacterType(Base):
     __tablename__ = "character_types"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
     description = Column(String)
 
@@ -22,7 +22,7 @@ class Character(Base):
     city = Column(Integer, ForeignKey('cities.id'), index=True)
     coord_x = Column(Integer, default=0)
     coord_y = Column(Integer, default=0)
-    type = Column(Integer, ForeignKey('character_types.id'))
+    logs = relationship("CharacterLog")
     type = Column(Integer, ForeignKey('character_types.id'), index=True)
     user = Column(Integer, ForeignKey('users.id'), index=True)
 
@@ -74,3 +74,16 @@ class Character(Base):
 
     def __str__(self):
         return self.name
+
+
+class CharacterLog(Base):
+    __tablename__ = "character_logs"
+
+    id = Column(BigInteger, primary_key=True, index=True)
+    character = Column(Integer, ForeignKey('characters.id'), index=True)
+    count = Column(Integer)
+    has_read = Column(Boolean)
+    message = Column(String)
+    timestamp = Column(DATETIME)
+
+    _index_character_and_read = Index('idx_character_and_read', character, has_read)

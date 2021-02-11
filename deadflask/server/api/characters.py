@@ -1,5 +1,5 @@
 from deadflask.server.app import app
-from deadflask.server.models.characters import CharacterType
+from deadflask.server.models.characters import CharacterType, CharacterLog
 
 
 def describe_characters_by_type(humans, zombies, corpses):
@@ -23,7 +23,7 @@ def split_by_category(characters, session):
     zombies = []
     corpses = []
     for character in characters:
-        character_type = app.db_session.query(CharacterType).get(character.type)
+        character_type = session.query(CharacterType).get(character.type)
         if character.health <= 0:
             corpses.append(character)
         elif character_type.name == "Zombie":  # TODO Maybe we'll have more than one?
@@ -32,3 +32,9 @@ def split_by_category(characters, session):
             humans.append(character)
 
     return humans, zombies, corpses
+
+
+def add_log(character, message, has_read=False, timestamp=False):
+    last_log = character.logs.query.order_by('-id').first()
+    if last_log.message == message:
+        last_log.count += 1
