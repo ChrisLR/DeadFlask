@@ -12,13 +12,13 @@ def describe_characters_by_type(humans, zombies, corpses):
 
         verb_is = inflect.plural_verb('is', amount)
         word_amount = inflect.number_to_words(amount)
-        plural_noun = inflect.plural_noun(noun)
+        plural_noun = inflect.plural_noun(noun, amount)
         category_strings.append(f"There {verb_is} {word_amount} {plural_noun}")
 
     return "\n".join(category_strings)
 
 
-def split_by_category(characters):
+def split_by_category(characters, session):
     humans = []
     zombies = []
     corpses = []

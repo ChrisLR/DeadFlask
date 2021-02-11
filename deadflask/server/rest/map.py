@@ -1,12 +1,13 @@
-import flask
 import logging
+
+import flask
 from sqlalchemy.exc import SQLAlchemyError
 
-from deadflask.server.rest import validation
+from deadflask.server import auth, dbcore
 from deadflask.server.app import app
-from deadflask.server.auth import require_user
 from deadflask.server.models.buildings import Building, BuildingType
 from deadflask.server.models.characters import Character, CharacterType
+from deadflask.server.rest import validation
 
 _move_to_fields = (
     validation.ValidatedField('building_id', int),
@@ -16,7 +17,7 @@ _move_to_fields = (
 _logger = logging.getLogger()
 
 
-def get_map(cx, cy, city):
+def get_map(cx, cy, city, session):
     # Just some quick validation, make something better
     if cx < 0 or cy < 0 or cx > 20000 or cy > 20000:
         cx = 0
@@ -27,7 +28,7 @@ def get_map(cx, cy, city):
     top = cy - 1
     bottom = cy + 1
 
-    rows = app.db_session.query(Building, BuildingType).filter(
+    rows = session.query(Building, BuildingType).filter(
         Building.coord_x >= left,
         Building.coord_x <= right,
         Building.coord_y >= top,
@@ -36,7 +37,7 @@ def get_map(cx, cy, city):
         Building.type == BuildingType.id
     ).order_by(Building.coord_y, Building.coord_x)
 
-    character_rows = app.db_session.query(Character, CharacterType).filter(
+    character_rows = session.query(Character, CharacterType).filter(
         Character.coord_x >= left,
         Character.coord_x <= right,
         Character.coord_y >= top,
@@ -72,30 +73,31 @@ def get_map(cx, cy, city):
 
 
 @app.route('/move_to', methods=['POST'])
-@require_user
-def move_to(user):
+@auth.require_user
+@dbcore.with_session
+def move_to(user, session):
     post_data = flask.request.get_json()
     valid_data, invalid_data = validation.validate_post_data(_move_to_fields, post_data)
     if invalid_data:
         return flask.jsonify({'message': list(invalid_data.values())}), 400
 
     building_id = valid_data['building_id']
-    building = app.db_session.query(Building).get(building_id)
+    building = session.query(Building).get(building_id)
     if not building:
         return flask.jsonify({'message': 'Invalid building_id'}), 400
 
     character_id = valid_data['character_id']
-    character = app.db_session.query(Character).get(character_id)
+    character = session.query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Invalid character_id'}), 400
 
     try:
         character.coord_x = building.coord_x
         character.coord_y = building.coord_y
-        app.db_session.commit()
     except SQLAlchemyError as e:
         _logger.error(f"Move To Failed: {e}")
-        app.db_session.rollback()
+        # TODO Let wrapper handle rollback and return using a custom exception
+        session.rollback()
         return flask.jsonify({'message': 'Server Error'}), 500
 
     result_rows = get_map(building.coord_x, building.coord_y, building.city)

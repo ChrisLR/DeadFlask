@@ -6,6 +6,7 @@ from deadflask.server.generation import utils
 from deadflask.server.models.buildings import BuildingType
 from deadflask.server.models.characters import CharacterType
 
+
 MODELS_AND_DATA = (
     (BuildingType, building_types),
     (CharacterType, character_types),
@@ -14,7 +15,7 @@ MODELS_AND_DATA = (
 _logger = logging.getLogger()
 
 
-def preload_data(session):
+def preload_data():
     preloaded_data = {}
     for model, data_instances in MODELS_AND_DATA:
         _logger.debug("Preloading {model.__tablename__} instances...")

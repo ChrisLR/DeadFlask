@@ -7,10 +7,10 @@ class DeadFlaskApp(Flask):
     def __init__(self):
         super().__init__(__name__)
         self.config["DEBUG"] = True
-        self.db_session = None
         self.app_config = None
         self.preloaded_data = None
         self.inflect = inflect.engine()
+        self.session_maker = None
 
 
 app = DeadFlaskApp()

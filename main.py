@@ -14,11 +14,12 @@ if __name__ == '__main__':
         config = json.load(file_stream)
 
     db_config = config["db_config"]
-    session = dbcore.connect_db(db_config)
-    preloaded_data = preload_data(session)
+    session_maker = dbcore.get_session_maker(db_config)
+    app.session_maker = session_maker
+    preloaded_data = preload_data()
     app.preloaded_data = preloaded_data
     #create_city(session, preloaded_data)
-    app.db_session = session
+
     app.app_config = config
 
     app.run()

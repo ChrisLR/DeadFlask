@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey, BigInteger, DATETIME
 
 from deadflask.server.dbcore import Base
 from deadflask.server.models.cities import City
+from sqlalchemy.orm import relationship
 
 
 class CharacterType(Base):
@@ -16,13 +17,14 @@ class Character(Base):
     __tablename__ = "characters"
 
     # Identity Fields
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
-    city = Column(Integer, ForeignKey('cities.id'))
+    city = Column(Integer, ForeignKey('cities.id'), index=True)
     coord_x = Column(Integer, default=0)
     coord_y = Column(Integer, default=0)
     type = Column(Integer, ForeignKey('character_types.id'))
-    user = Column(Integer, ForeignKey('users.id'))
+    type = Column(Integer, ForeignKey('character_types.id'), index=True)
+    user = Column(Integer, ForeignKey('users.id'), index=True)
 
     # Current State Fields
     health = Column(Integer, default=50)
@@ -36,25 +38,25 @@ class Character(Base):
     _index_coords = Index('idx_character_coordinates', coord_x, coord_y)
 
     @classmethod
-    def create(cls, app, name, character_type, user=None):
-        city = app.db_session.query(City).first()
+    def create(cls, session, name, character_type, user=None):
+        city = session.query().first()
         if user:
             character = Character(name=name, type=character_type.id, user=user.id, city=city.id)
         else:
             character = Character(name=name, type=character_type.id, is_bot=True, city=city.id)
 
-        app.db_session.add(character)
+        session.add(character)
 
         return character
 
     @classmethod
-    def exists(cls, app, name):
-        character = app.db_session.query(Character).filter_by(name=name).one_or_none()
+    def exists(cls, session, name):
+        character = session.query(Character).filter_by(name=name).one_or_none()
         return bool(character)
 
     @classmethod
-    def get_at_building(cls, app, building, inside):
-        characters = app.db_session.query(Character).filter(
+    def get_at_building(cls, session, building, inside):
+        characters = session.query(Character).filter(
             Character.coord_x == building.coord_x,
             Character.coord_y == building.coord_y,
             Character.city == building.city,
