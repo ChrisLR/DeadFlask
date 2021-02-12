@@ -13,7 +13,7 @@ def post_login():
     email = post_data.get('email', '')
     password = post_data.get('password', '')
 
-    user = User.authenticate(app, email, password)
+    user = User.authenticate(email, password)
     if not user:
         response = {'message': "Invalid credentials", 'token': None}
         return flask.jsonify(response), 401

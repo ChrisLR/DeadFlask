@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey, BigInteger, DATETIME
+from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey, BigInteger, DateTime
+from sqlalchemy.orm import relationship
 
 from deadflask.server.dbcore import Base
-from deadflask.server.models.cities import City
-from sqlalchemy.orm import relationship
+from deadflask.server.app import app
 
 
 class CharacterType(Base):
@@ -38,7 +38,8 @@ class Character(Base):
     _index_coords = Index('idx_character_coordinates', coord_x, coord_y)
 
     @classmethod
-    def create(cls, session, name, character_type, user=None):
+    def create(cls, name, character_type, user=None):
+        session = app.db_session
         city = session.query().first()
         if user:
             character = Character(name=name, type=character_type.id, user=user.id, city=city.id)
@@ -50,13 +51,13 @@ class Character(Base):
         return character
 
     @classmethod
-    def exists(cls, session, name):
-        character = session.query(Character).filter_by(name=name).one_or_none()
+    def exists(cls, name):
+        character = app.db_session.query(Character).filter_by(name=name).one_or_none()
         return bool(character)
 
     @classmethod
-    def get_at_building(cls, session, building, inside):
-        characters = session.query(Character).filter(
+    def get_at_building(cls, building, inside):
+        characters = app.db_session.query(Character).filter(
             Character.coord_x == building.coord_x,
             Character.coord_y == building.coord_y,
             Character.city == building.city,
@@ -84,6 +85,6 @@ class CharacterLog(Base):
     count = Column(Integer)
     has_read = Column(Boolean)
     message = Column(String)
-    timestamp = Column(DATETIME)
+    timestamp = Column(DateTime)
 
     _index_character_and_read = Index('idx_character_and_read', character, has_read)

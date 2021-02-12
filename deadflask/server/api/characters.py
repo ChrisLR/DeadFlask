@@ -18,12 +18,12 @@ def describe_characters_by_type(humans, zombies, corpses):
     return "\n".join(category_strings)
 
 
-def split_by_category(characters, session):
+def split_by_category(characters):
     humans = []
     zombies = []
     corpses = []
     for character in characters:
-        character_type = session.query(CharacterType).get(character.type)
+        character_type = app.db_session.query(CharacterType).get(character.type)
         if character.health <= 0:
             corpses.append(character)
         elif character_type.name == "Zombie":  # TODO Maybe we'll have more than one?

@@ -4,9 +4,11 @@ import faker
 
 from deadflask.server.models.buildings import Building
 from deadflask.server.models.cities import City
+from deadflask.server import dbcore
 
 
-def create_city(session, preload_data):
+@dbcore.with_session
+def create_city(preload_data, session):
     my_faker = faker.Faker()
     city_name = my_faker.city()
     city = City(name=city_name)

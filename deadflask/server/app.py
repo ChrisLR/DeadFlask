@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 
+# SESSION CAN BE STORED ON APP IF REQUEST DECORATOR IS AXED ON COMMIT/ROLLBACK
 class DeadFlaskApp(Flask):
     def __init__(self):
         super().__init__(__name__)

@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 from functools import wraps
 
@@ -6,6 +7,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from deadflask.server.app import app
+
+_logger = logging.getLogger()
 
 Base = declarative_base()
 
@@ -67,3 +70,14 @@ def session_scope():
         raise
     finally:
         session.close()
+
+
+def prepare_new_session():
+    new_session = app.session_maker()
+    app.db_session = new_session
+
+
+def commit_session(response):
+    app.db_session.commit()
+
+    return response

@@ -3,7 +3,7 @@ import logging
 import flask
 from sqlalchemy.exc import IntegrityError
 
-from deadflask.server import auth, dbcore
+from deadflask.server import auth, exceptions
 from deadflask.server.rest import validation, map
 from deadflask.server.app import app
 from deadflask.server.models.characters import Character, CharacterType
@@ -14,12 +14,12 @@ _create_character_fields = (
     validation.ValidatedField('name', str),
     validation.ValidatedField('character_type_id', int),
 )
+_logger = logging.getLogger()
 
 
 @app.route('/character', methods=['POST'])
 @auth.require_user
-@dbcore.with_session
-def create_character(user, session):
+def create_character(user):
     post_data = flask.request.get_json()
     valid_data, invalid_data = validation.validate_post_data(_create_character_fields, post_data)
     if invalid_data:
@@ -27,21 +27,20 @@ def create_character(user, session):
 
     name = valid_data['name']
     # TODO A Proper name regex validation must be made
-    if not name or Character.exists(session, name):
+    if not name or Character.exists(name):
         return flask.jsonify({'message': 'Character name already exists'}), 400
 
     character_type_id = valid_data['character_type_id']
-    character_type = session.query(CharacterType).get(character_type_id)
+    character_type = app.db_session.query(CharacterType).get(character_type_id)
     if not character_type:
         return flask.jsonify({'message': 'Invalid Character type'}), 400
 
     # TODO Should users have a maximum amount of characters?
     try:
-        character = Character.create(session, name=name, character_type=character_type, user=user)
+        character = Character.create(name=name, character_type=character_type, user=user)
     except IntegrityError as e:
-        logging.error(f"Create Character failed. {e}")
-        session.rollback()
-        return flask.jsonify({'message': 'Could not create character.'}), 500
+        _logger.error(e)
+        raise exceptions.APIError("Could not create character.")
 
     response = {'message': 'OK', 'character_id': character.id}
 
@@ -50,9 +49,8 @@ def create_character(user, session):
 
 @app.route('/character', methods=['GET'])
 @auth.require_user
-@dbcore.with_session
-def get_characters(user, session):
-    characters = session.query(Character).filter_by(user=user.id).all()
+def get_characters(user):
+    characters = app.db_session.query(Character).filter_by(user=user.id).all()
     if not characters:
         characters = []
 
@@ -66,16 +64,15 @@ def get_characters(user, session):
 
 @app.route('/character/<int:character_id>', methods=['GET'])
 @auth.require_user
-@dbcore.with_session
-def get_character_info(user, character_id, session):
-    character = session.query(Character).get(character_id)
+def get_character_info(user, character_id):
+    character = app.db_session.query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
     if character.user != user.id:
         return flask.jsonify({'message': 'Invalid character id'}), 400
 
-    character_type = session.query(CharacterType).get(character.type)
+    character_type = app.db_session.query(CharacterType).get(character.type)
     # TODO Maybe we'll have more than one?
     is_zombie = character_type.name == "Zombie"
 
@@ -93,9 +90,8 @@ def get_character_info(user, character_id, session):
 
 @app.route('/character/types', methods=['GET'])
 @auth.require_user
-@dbcore.with_session
-def get_character_types(user, session):
-    character_types = session.query(CharacterType).all()
+def get_character_types(user):
+    character_types = app.db_session.query(CharacterType).all()
     response = {
         'message': 'OK',
         'character_types': [
@@ -109,16 +105,15 @@ def get_character_types(user, session):
 
 @app.route('/character/<int:character_id>/map', methods=['GET'])
 @auth.require_user
-@dbcore.with_session
-def get_character_map(user, character_id, session):
-    character = session.query(Character).get(character_id)
+def get_character_map(user, character_id):
+    character = app.db_session.query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
     if character.user != user.id:
         return flask.jsonify({'message': 'Invalid character id'}), 400
 
-    building = session.query(Building).filter(
+    building = app.db_session.query(Building).filter(
         Building.coord_x == character.coord_x,
         Building.coord_y == character.coord_y,
         Building.city == character.city
@@ -136,9 +131,8 @@ def get_character_map(user, character_id, session):
 
 @app.route('/character/<int:character_id>/look', methods=['GET'])
 @auth.require_user
-@dbcore.with_session
-def get_character_look(user, character_id, session):
-    character = session.query(Character).get(character_id)
+def get_character_look(user, character_id):
+    character = app.db_session.query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
@@ -155,5 +149,3 @@ def get_character_look(user, character_id, session):
     }
 
     return flask.jsonify(response)
-
-

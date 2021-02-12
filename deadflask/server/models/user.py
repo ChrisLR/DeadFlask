@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 from deadflask.server.dbcore import Base
+from deadflask.server.app import app
 
 
 class User(Base):
@@ -15,7 +16,7 @@ class User(Base):
     characters = relationship('Character')
 
     @classmethod
-    def authenticate(cls, app, email, password):
+    def authenticate(cls, email, password):
         if not email or not password:
             return None
 
@@ -28,7 +29,7 @@ class User(Base):
         return user
 
     @classmethod
-    def create(cls, app, email, password):
+    def create(cls, email, password):
         hashed_password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
         decoded_password = hashed_password.decode('utf8')
         new = User(email=email, password=str(decoded_password))

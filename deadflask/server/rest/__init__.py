@@ -1,1 +1,1 @@
-from deadflask.server.rest import buildings, characters, login, map
+from deadflask.server.rest import characters, errors, login, map
