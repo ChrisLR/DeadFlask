@@ -1,13 +1,16 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col"><CharacterMap /></div>
-      <div class="col"><CharacterLook /></div>
+      <div class="col"><CharacterMap/></div>
+      <div class="col">
+        <CharacterLook/><br>
+        <CharacterLogs/><br>
+        <CharacterActions/>
+      </div>
     </div>
     <div class="row">
-      <div class="col"><CharacterInfo /></div>
-      <div class="col"><CharacterLogs /></div>
-      <div class="col"><CharacterActions /></div>
+      <div class="col"><CharacterInfo/></div>
+      <div class="col"></div>
     </div>
   </div>
 </template>

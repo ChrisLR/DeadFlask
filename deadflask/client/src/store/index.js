@@ -83,8 +83,6 @@ const mutations = {
     state.character = data;
   },
   setCharacterLogs(state, data) {
-    console.log(`Doing this ${Object.values(data)}`);
-    console.log(`Doing this ${Object.values(data.logs)}`);
     state.characterLogs = data.logs;
   },
   setCharacterId(state, data) {
