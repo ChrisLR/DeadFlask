@@ -5,7 +5,7 @@ from deadflask.server.models.buildings import BuildingType
 def describe_building(building):
     basic_desc = building.description
     if not basic_desc:
-        building_type = app.db_session.query(BuildingType).get(building.type)
+        building_type = app.db_query(BuildingType).get(building.type)
         basic_desc = building_type.description or ""
 
     doors_desc = describe_doors_and_barricades(building)

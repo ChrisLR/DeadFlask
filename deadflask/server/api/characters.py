@@ -23,7 +23,7 @@ def split_by_category(characters):
     zombies = []
     corpses = []
     for character in characters:
-        character_type = app.db_session.query(CharacterType).get(character.type)
+        character_type = app.db_query(CharacterType).get(character.type)
         if character.health <= 0:
             corpses.append(character)
         elif character_type.name == "Zombie":  # TODO Maybe we'll have more than one?
@@ -34,7 +34,16 @@ def split_by_category(characters):
     return humans, zombies, corpses
 
 
-def add_log(character, message, has_read=False, timestamp=False):
+def add_log(character, message, has_read=False, timestamp=None):
     last_log = character.logs.query.order_by('-id').first()
     if last_log.message == message:
         last_log.count += 1
+        return last_log
+
+    new_log = CharacterLog(
+        character=character.id, has_read=has_read,
+        message=message, timestamp=timestamp
+    )
+    app.db_session.add(new_log)
+
+    return new_log

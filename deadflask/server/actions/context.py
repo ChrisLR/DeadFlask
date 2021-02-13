@@ -4,7 +4,8 @@ class ContextAction(object):
     requires_select_item = False
     requires_freeform_text = False
 
-    def can_execute(self, character) -> bool:
+    @classmethod
+    def can_execute(cls, character) -> bool:
         """
         This method is used to define if a character could use the action.
         No targets are passed at this point
@@ -16,7 +17,8 @@ class ContextAction(object):
         """
         return True
 
-    def execute(self, character, target=None, item=None, text=None):
+    @classmethod
+    def execute(cls, character, target=None, item=None, text=None):
         """
         This method executes the action if possible and returns if the action was executed.
         As long as the action is executed it should return True, even if it failed (ex: A missed attack)

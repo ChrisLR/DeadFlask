@@ -1,6 +1,6 @@
 from deadflask.server.dbcore import Base
 from sqlalchemy import Column, Integer, String, Boolean, Index, ForeignKey, UniqueConstraint
-
+from deadflask.server.app import app
 
 class BuildingType(Base):
     __tablename__ = "building_types"
@@ -44,3 +44,7 @@ class Building(Base):
 
     _index_coords = Index('idx_coordinates', coord_x, coord_y)
     _unq_name_city = UniqueConstraint(name, city)
+
+    @classmethod
+    def get_at(cls, coord_x, coord_y):
+        return app.db_query(Building).filter_by(coord_x=coord_x, coord_y=coord_y)

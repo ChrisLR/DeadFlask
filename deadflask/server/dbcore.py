@@ -1,83 +1,52 @@
 import logging
-from contextlib import contextmanager
-from functools import wraps
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-from deadflask.server.app import app
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 _logger = logging.getLogger()
 
 Base = declarative_base()
 
 
-def connect_db(db_config):
-    username = db_config["username"]
-    password = db_config["password"]
-    host = db_config["host"]
-    dbname = db_config["dbname"]
-    connection_string = f"postgres+psycopg2://{username}:{password}@{host}/{dbname}"
+class DBConnection(object):
+    def __init__(self, db_config):
+        self.username = db_config["username"]
+        self.password = db_config["password"]
+        self.host = db_config["host"]
+        self.dbname = db_config["dbname"]
+        self.connection_string = f"postgres+psycopg2://{self.username}:{self.password}@{self.host}/{self.dbname}"
+        self.session = None
+        self.engine = create_engine(self.connection_string, echo=True)
 
-    Session = sessionmaker()
-    engine = create_engine(connection_string, echo=True)
-    metadata = Base.metadata
-    metadata.create_all(engine)
+    def connect(self):
+        _logger.info(f"Connecting to {self.connection_string}..")
+        self.session = scoped_session(sessionmaker(self.engine))
+        self.on_connect()
 
-    conn = engine.connect()
-    session = Session(bind=conn)
+    def on_connect(self):
+        _logger.info(f"Creating metadata..")
+        metadata = Base.metadata
+        metadata.create_all(self.engine)
 
-    return session
+    @property
+    def query(self):
+        if not self.session:
+            self.connect()
 
+        return self.session.query
 
-def get_session_maker(db_config):
-    username = db_config["username"]
-    password = db_config["password"]
-    host = db_config["host"]
-    dbname = db_config["dbname"]
-    connection_string = f"postgres+psycopg2://{username}:{password}@{host}/{dbname}"
+    def prepare_new_session(self):
+        _logger.info(f"Preparing new db session..")
+        self.session()
 
-    engine = create_engine(connection_string, echo=True)
-    metadata = Base.metadata
-    metadata.create_all(engine)
-    session_maker = sessionmaker(engine)
+    def commit_session(self, response):
+        _logger.info(f"Committing db session..")
+        self.session.commit()
+        self.session.remove()
 
-    return session_maker
+        return response
 
-
-def with_session(func):
-    """
-    Decorator for session_scope
-    """
-    @wraps(func)
-    def _wrapped_func(*args, **kwargs):
-        with session_scope() as session:
-            return func(*args, **kwargs, session=session)
-
-    return _wrapped_func
-
-
-@contextmanager
-def session_scope():
-    """Provide a transactional scope around a series of operations."""
-    session = app.session_maker()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
-
-
-def prepare_new_session():
-    new_session = app.session_maker()
-    app.db_session = new_session
-
-
-def commit_session(response):
-    app.db_session.commit()
-
-    return response
+    def close(self):
+        _logger.info(f"Closing db connection..")
+        self.session.close()

@@ -27,7 +27,7 @@ def get_map(cx, cy, city):
     top = cy - 1
     bottom = cy + 1
 
-    rows = app.db_session.query(Building, BuildingType).filter(
+    rows = app.db_query(Building, BuildingType).filter(
         Building.coord_x >= left,
         Building.coord_x <= right,
         Building.coord_y >= top,
@@ -36,7 +36,7 @@ def get_map(cx, cy, city):
         Building.type == BuildingType.id
     ).order_by(Building.coord_y, Building.coord_x)
 
-    character_rows = app.db_session.query(Character, CharacterType).filter(
+    character_rows = app.db_query(Character, CharacterType).filter(
         Character.coord_x >= left,
         Character.coord_x <= right,
         Character.coord_y >= top,
@@ -80,12 +80,12 @@ def move_to(user):
         return flask.jsonify({'message': list(invalid_data.values())}), 400
 
     building_id = valid_data['building_id']
-    building = app.db_session.query(Building).get(building_id)
+    building = app.db_query(Building).get(building_id)
     if not building:
         return flask.jsonify({'message': 'Invalid building_id'}), 400
 
     character_id = valid_data['character_id']
-    character = app.db_session.query(Character).get(character_id)
+    character = app.db_query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Invalid character_id'}), 400
 

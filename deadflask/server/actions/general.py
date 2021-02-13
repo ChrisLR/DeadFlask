@@ -6,9 +6,8 @@ from deadflask.server.models.characters import Character
 
 
 def look(character):
-    session = app.db_session
     inside_str = "inside" if character.is_inside else "outside"
-    building = session.query(Building).filter_by(
+    building = app.db_query(Building).filter_by(
         coord_x=character.coord_x, coord_y=character.coord_y, city=character.city
     ).one_or_none()
     building_desc = describe_building(building)

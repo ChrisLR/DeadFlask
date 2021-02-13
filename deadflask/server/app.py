@@ -11,7 +11,11 @@ class DeadFlaskApp(Flask):
         self.app_config = None
         self.preloaded_data = None
         self.inflect = inflect.engine()
-        self.session_maker = None
+        self.db_connection = None
+
+    @property
+    def db_query(self):
+        return self.db_connection.query
 
 
 app = DeadFlaskApp()

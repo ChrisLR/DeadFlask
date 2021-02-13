@@ -52,12 +52,12 @@ class Character(Base):
 
     @classmethod
     def exists(cls, name):
-        character = app.db_session.query(Character).filter_by(name=name).one_or_none()
+        character = app.db_query(Character).filter_by(name=name).one_or_none()
         return bool(character)
 
     @classmethod
     def get_at_building(cls, building, inside):
-        characters = app.db_session.query(Character).filter(
+        characters = app.db_query(Character).filter(
             Character.coord_x == building.coord_x,
             Character.coord_y == building.coord_y,
             Character.city == building.city,

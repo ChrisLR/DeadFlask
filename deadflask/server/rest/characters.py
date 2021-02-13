@@ -4,11 +4,11 @@ import flask
 from sqlalchemy.exc import IntegrityError
 
 from deadflask.server import auth, exceptions
-from deadflask.server.rest import validation, map
+from deadflask.server.actions import general as general_actions, listing
 from deadflask.server.app import app
-from deadflask.server.models.characters import Character, CharacterType
 from deadflask.server.models.buildings import Building
-from deadflask.server.actions import general as general_actions
+from deadflask.server.models.characters import Character, CharacterType
+from deadflask.server.rest import validation, map
 
 _create_character_fields = (
     validation.ValidatedField('name', str),
@@ -31,7 +31,7 @@ def create_character(user):
         return flask.jsonify({'message': 'Character name already exists'}), 400
 
     character_type_id = valid_data['character_type_id']
-    character_type = app.db_session.query(CharacterType).get(character_type_id)
+    character_type = app.db_query(CharacterType).get(character_type_id)
     if not character_type:
         return flask.jsonify({'message': 'Invalid Character type'}), 400
 
@@ -50,7 +50,7 @@ def create_character(user):
 @app.route('/character', methods=['GET'])
 @auth.require_user
 def get_characters(user):
-    characters = app.db_session.query(Character).filter_by(user=user.id).all()
+    characters = app.db_query(Character).filter_by(user=user.id).all()
     if not characters:
         characters = []
 
@@ -65,14 +65,14 @@ def get_characters(user):
 @app.route('/character/<int:character_id>', methods=['GET'])
 @auth.require_user
 def get_character_info(user, character_id):
-    character = app.db_session.query(Character).get(character_id)
+    character = app.db_query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
     if character.user != user.id:
         return flask.jsonify({'message': 'Invalid character id'}), 400
 
-    character_type = app.db_session.query(CharacterType).get(character.type)
+    character_type = app.db_query(CharacterType).get(character.type)
     # TODO Maybe we'll have more than one?
     is_zombie = character_type.name == "Zombie"
 
@@ -91,7 +91,7 @@ def get_character_info(user, character_id):
 @app.route('/character/types', methods=['GET'])
 @auth.require_user
 def get_character_types(user):
-    character_types = app.db_session.query(CharacterType).all()
+    character_types = app.db_query(CharacterType).all()
     response = {
         'message': 'OK',
         'character_types': [
@@ -106,14 +106,14 @@ def get_character_types(user):
 @app.route('/character/<int:character_id>/map', methods=['GET'])
 @auth.require_user
 def get_character_map(user, character_id):
-    character = app.db_session.query(Character).get(character_id)
+    character = app.db_query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
     if character.user != user.id:
         return flask.jsonify({'message': 'Invalid character id'}), 400
 
-    building = app.db_session.query(Building).filter(
+    building = app.db_query(Building).filter(
         Building.coord_x == character.coord_x,
         Building.coord_y == character.coord_y,
         Building.city == character.city
@@ -132,7 +132,7 @@ def get_character_map(user, character_id):
 @app.route('/character/<int:character_id>/look', methods=['GET'])
 @auth.require_user
 def get_character_look(user, character_id):
-    character = app.db_session.query(Character).get(character_id)
+    character = app.db_query(Character).get(character_id)
     if not character:
         return flask.jsonify({'message': 'Unknown character id'}), 400
 
@@ -149,3 +149,68 @@ def get_character_look(user, character_id):
     }
 
     return flask.jsonify(response)
+
+
+@app.route('/character/<int:character_id>/actions', methods=['GET'])
+@auth.require_user
+def get_character_actions(user, character_id):
+    character = app.db_query(Character).get(character_id)
+    if not character:
+        return flask.jsonify({'message': 'Unknown character id'}), 400
+
+    if character.user != user.id:
+        return flask.jsonify({'message': 'Invalid character id'}), 400
+
+    actions = listing.get_for_character(character)
+    json_actions = [{
+        'name': action.name,
+        'requires_select_target': action.requires_select_target,
+        'requires_select_item': action.requires_select_item,
+        'requires_freeform_text': action.requires_freeform_text,
+    } for action in actions]
+
+    return flask.jsonify(json_actions)
+
+
+@app.route('/character/<int:character_id>/actions', methods=['POST'])
+@auth.require_user
+def execute_character_action(user, character_id):
+    post_data = flask.request.get_json()
+    action = post_data.get("action")
+    if not action:
+        return flask.jsonify({'message': 'Missing Action'}), 400
+
+    action_name = action.get('name')
+    if not action_name:
+        return flask.jsonify({'message': 'Invalid Action'}), 400
+
+    action = listing.get_by_name(action_name)
+    if not action:
+        return flask.jsonify({'message': 'Missing Action'}), 400
+
+    character = app.db_query(Character).get(character_id)
+    if not character:
+        return flask.jsonify({'message': 'Unknown character id'}), 400
+
+    if character.user != user.id:
+        return flask.jsonify({'message': 'Invalid character id'}), 400
+
+    if not action.can_execute(character):
+        return flask.jsonify({'message': 'Action may not execute'}), 400
+
+    select_target = action.get('select_target')
+    if action.requires_select_target and not select_target:
+        return flask.jsonify({'message': 'Action requires select_target'}), 400
+
+    select_item = action.get('select_item')
+    if action.requires_select_item and not select_item:
+        return flask.jsonify({'message': 'Action requires select_item'}), 400
+
+    freeform_text = action.get('freeform_text')
+    if action.requires_freeform_text and not freeform_text:
+        return flask.jsonify({'message': 'Action requires freeform_text'}), 400
+
+    result = action.execute(character, target=select_target, item=select_item, text=freeform_text)
+    json_result = {'message': 'OK', 'success': result}
+
+    return flask.jsonify(json_result)

@@ -18,7 +18,7 @@ def require_user(func):
             token = auth_headers[1]
             data = jwt.decode(token, app.app_config['secret_key'], algorithms=["HS256"])
             user_id = data.get("user_id")
-            user = app.db_session.query(User).filter_by(id=user_id).one_or_none()
+            user = app.db_query(User).filter_by(id=user_id).one_or_none()
             if not user:
                 return flask.jsonify({'message': 'Invalid User'}), 401
 

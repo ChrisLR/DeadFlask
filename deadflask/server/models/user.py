@@ -20,7 +20,7 @@ class User(Base):
         if not email or not password:
             return None
 
-        user = app.db_session.query(User).filter_by(email=email).one_or_none()
+        user = app.db_query(User).filter_by(email=email).one_or_none()
         encoded_password = password.encode('utf-8')
         encoded_db_password = user.password.encode('utf-8')
         if not user or not bcrypt.checkpw(encoded_password, encoded_db_password):
