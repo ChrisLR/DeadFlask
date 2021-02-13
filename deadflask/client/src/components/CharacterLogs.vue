@@ -1,8 +1,11 @@
 <template>
   <div>
-    <div v-for="(log, li) in logs" :key="li">
-      {{ log.message }} <span v-if="log.count">{{ `x${log.count}` }}</span><br>
-    </div>
+    <b>Messages</b>
+    <ul class="card">
+      <li v-for="(log, li) in logs" :key="li">
+        {{ log.message }} <span v-if="log.count">{{ `x${log.count}` }}</span>
+      </li>
+    </ul>
   </div>
 </template>
 

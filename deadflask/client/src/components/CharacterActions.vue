@@ -1,10 +1,15 @@
 <template>
   <div>
-    <div v-for="(action, ai) in actions" :key="ai">
-      <b-button v-on:click="doAction(action, ai)">
-        {{ action.name }}
-      </b-button>
-      <b-input v-model="freeFormTexts[ai]" v-if="action.requires_freeform_text"/>
+    <b>Actions</b>
+    <div>
+      <div v-for="(action, ai) in actions" :key="ai">
+        <b-button v-on:click="doAction(action, ai)">
+          {{ action.name }}
+          <b-input v-model="freeFormTexts[ai]"
+                   v-if="action.requires_freeform_text" v-on:click.stop />
+        </b-button>
+
+      </div>
     </div>
   </div>
 </template>
