@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(log, li) in logs" :key="li">
-      {{ log.message }} <br>
+      {{ log.message }} <span v-if="log.count">{{ `x${log.count}` }}</span><br>
     </div>
   </div>
 </template>

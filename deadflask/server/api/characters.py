@@ -36,8 +36,13 @@ def split_by_category(characters):
 
 def add_log(character, message, has_read=False, timestamp=None):
     last_log = character.logs[-1] if character.logs else None
-    if last_log and last_log.message == message:
-        last_log.count += 1
+    if last_log and last_log.message == message and not last_log.has_read:
+        count = last_log.count
+        if not count:
+            last_log.count = 2
+        else:
+            last_log.count = count + 1
+
         return last_log
 
     new_log = CharacterLog(
