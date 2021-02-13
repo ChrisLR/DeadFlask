@@ -6,7 +6,7 @@
     </div>
     <div class="row">
       <div class="col"><CharacterInfo /></div>
-      <div class="col"></div>
+      <div class="col"><CharacterActions /></div>
     </div>
   </div>
 </template>
@@ -16,6 +16,7 @@
 import CharacterInfo from './CharacterInfo.vue';
 import CharacterMap from './CharacterMap.vue';
 import CharacterLook from './CharacterLook.vue';
+import CharacterActions from './CharacterActions.vue';
 
 export default {
   data() {
@@ -31,6 +32,7 @@ export default {
     CharacterInfo,
     CharacterMap,
     CharacterLook,
+    CharacterActions,
   },
   methods: {},
   beforeMount() {

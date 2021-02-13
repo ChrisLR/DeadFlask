@@ -4,12 +4,14 @@ import Vuex from 'vuex';
 import { isValidJwt, EventBus } from '../utils';
 import {
   fetchCharacterMap, moveTo, authenticate, fetchCharacterInfo, fetchCharacterLook,
+  fetchCharacterActions, postExecuteAction,
 } from '../api/index';
 
 Vue.use(Vuex);
 
 const state = {
   // single source of data
+  characterActions: {},
   building: {},
   buildingId: -1,
   buildingsMap: [],
@@ -33,6 +35,9 @@ const actions = {
       .then(() => context.commit('setBuildingId', buildingId))
       .then(() => context.dispatch('loadCharacterLook'));
   },
+  doCharacterAction(context, action) {
+    return postExecuteAction(context.state.characterId, action);
+  },
   login(context, userData) {
     context.commit('setUserData', { userData });
     return authenticate(userData)
@@ -49,6 +54,10 @@ const actions = {
     return fetchCharacterLook(context.state.characterId)
       .then((response) => context.commit('setBuildingInfo', response.data));
   },
+  loadCharacterActions(context) {
+    fetchCharacterActions(context.state.characterId)
+      .then((response) => context.commit('setCharacterActions', response.data));
+  },
 };
 
 const mutations = {
@@ -61,6 +70,9 @@ const mutations = {
   setBuildingsMap(state, data) {
     state.buildingsMap = data.rows;
     state.buildingId = data.building_id;
+  },
+  setCharacterActions(state, data) {
+    state.characterActions = data;
   },
   setCharacterInfo(state, data) {
     state.character = data;

@@ -60,7 +60,17 @@ export function fetchCharacters() {
   return axios.get(path, getHeadersJwt(path));
 }
 
+export function fetchCharacterActions(characterId) {
+  const path = `${srvPath}/character/${characterId}/actions`;
+  return axios.get(path, getHeadersJwt(path));
+}
+
 export function fetchCharacterLook(characterId) {
   const path = `${srvPath}/character/${characterId}/look`;
   return axios.get(path, getHeadersJwt(path));
+}
+
+export function postExecuteAction(characterId, action) {
+  const path = `${srvPath}/character/${characterId}/actions`;
+  return axios.post(path, { action }, getHeadersJwt(path));
 }
