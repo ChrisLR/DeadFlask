@@ -4,7 +4,7 @@ import Vuex from 'vuex';
 import { isValidJwt, EventBus } from '../utils';
 import {
   fetchCharacterMap, moveTo, authenticate, fetchCharacterInfo, fetchCharacterLook,
-  fetchCharacterActions, postExecuteAction,
+  fetchCharacterActions, postExecuteAction, fetchCharacterLogs,
 } from '../api/index';
 
 Vue.use(Vuex);
@@ -12,6 +12,7 @@ Vue.use(Vuex);
 const state = {
   // single source of data
   characterActions: {},
+  characterLogs: [],
   building: {},
   buildingId: -1,
   buildingsMap: [],
@@ -58,6 +59,10 @@ const actions = {
     fetchCharacterActions(context.state.characterId)
       .then((response) => context.commit('setCharacterActions', response.data));
   },
+  loadCharacterLogs(context) {
+    fetchCharacterLogs(context.state.characterId)
+      .then((response) => context.commit('setCharacterLogs', response.data));
+  },
 };
 
 const mutations = {
@@ -76,6 +81,11 @@ const mutations = {
   },
   setCharacterInfo(state, data) {
     state.character = data;
+  },
+  setCharacterLogs(state, data) {
+    console.log(`Doing this ${Object.values(data)}`);
+    console.log(`Doing this ${Object.values(data.logs)}`);
+    state.characterLogs = data.logs;
   },
   setCharacterId(state, data) {
     state.characterId = data;

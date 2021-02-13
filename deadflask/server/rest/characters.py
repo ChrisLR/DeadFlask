@@ -7,7 +7,7 @@ from deadflask.server import auth, exceptions
 from deadflask.server.actions import general as general_actions, listing
 from deadflask.server.app import app
 from deadflask.server.models.buildings import Building
-from deadflask.server.models.characters import Character, CharacterType
+from deadflask.server.models.characters import Character, CharacterType, CharacterLog
 from deadflask.server.rest import validation, map
 
 _create_character_fields = (
@@ -217,3 +217,31 @@ def execute_character_action(user, character_id):
     json_result = {'message': 'OK', 'success': result}
 
     return flask.jsonify(json_result)
+
+
+@app.route('/character/<int:character_id>/logs', methods=['GET'])
+@auth.require_user
+def get_character_logs(user, character_id):
+    character = app.db_query(Character).get(character_id)
+    if not character:
+        return flask.jsonify({'message': 'Unknown character id'}), 400
+
+    if character.user != user.id:
+        return flask.jsonify({'message': 'Invalid character id'}), 400
+
+    logs = app.db_query(CharacterLog).filter_by(
+        character=character.id,
+        has_read=False,
+    ).all()
+    # app.db_query(CharacterLog).filter_by(
+    #     character=character.id,
+    #     has_read=False,
+    # ).update({'has_read': True})
+
+    logs = [
+        {'message': log.message, 'count': log.count, 'timestamp': log.timestamp}
+        for log in logs
+    ]
+    result = {'message': 'OK', 'logs': logs}
+
+    return flask.jsonify(result)

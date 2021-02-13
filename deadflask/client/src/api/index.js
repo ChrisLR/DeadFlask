@@ -70,6 +70,11 @@ export function fetchCharacterLook(characterId) {
   return axios.get(path, getHeadersJwt(path));
 }
 
+export function fetchCharacterLogs(characterId) {
+  const path = `${srvPath}/character/${characterId}/logs`;
+  return axios.get(path, getHeadersJwt(path));
+}
+
 export function postExecuteAction(characterId, action) {
   const path = `${srvPath}/character/${characterId}/actions`;
   return axios.post(path, { action }, getHeadersJwt(path));
