@@ -233,10 +233,10 @@ def get_character_logs(user, character_id):
         character=character.id,
         has_read=False,
     ).all()
-    # app.db_query(CharacterLog).filter_by(
-    #     character=character.id,
-    #     has_read=False,
-    # ).update({'has_read': True})
+    app.db_query(CharacterLog).filter_by(
+        character=character.id,
+        has_read=False,
+    ).update({'has_read': True})
 
     logs = [
         {'message': log.message, 'count': log.count, 'timestamp': log.timestamp}
