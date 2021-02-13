@@ -17,6 +17,10 @@ class DeadFlaskApp(Flask):
     def db_query(self):
         return self.db_connection.query
 
+    @property
+    def db_session(self):
+        return self.db_connection.session
+
 
 app = DeadFlaskApp()
 

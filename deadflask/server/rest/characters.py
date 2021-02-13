@@ -176,11 +176,14 @@ def get_character_actions(user, character_id):
 @auth.require_user
 def execute_character_action(user, character_id):
     post_data = flask.request.get_json()
-    action = post_data.get("action")
-    if not action:
+    if not post_data:
+        return flask.jsonify({'message': 'Missing POST data'}), 400
+
+    action_data = post_data.get("action")
+    if not action_data:
         return flask.jsonify({'message': 'Missing Action'}), 400
 
-    action_name = action.get('name')
+    action_name = action_data.get('name')
     if not action_name:
         return flask.jsonify({'message': 'Invalid Action'}), 400
 
@@ -198,15 +201,15 @@ def execute_character_action(user, character_id):
     if not action.can_execute(character):
         return flask.jsonify({'message': 'Action may not execute'}), 400
 
-    select_target = action.get('select_target')
+    select_target = action_data.get('select_target')
     if action.requires_select_target and not select_target:
         return flask.jsonify({'message': 'Action requires select_target'}), 400
 
-    select_item = action.get('select_item')
+    select_item = action_data.get('select_item')
     if action.requires_select_item and not select_item:
         return flask.jsonify({'message': 'Action requires select_item'}), 400
 
-    freeform_text = action.get('freeform_text')
+    freeform_text = action_data.get('freeform_text')
     if action.requires_freeform_text and not freeform_text:
         return flask.jsonify({'message': 'Action requires freeform_text'}), 400
 

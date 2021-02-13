@@ -46,5 +46,5 @@ class Building(Base):
     _unq_name_city = UniqueConstraint(name, city)
 
     @classmethod
-    def get_at(cls, coord_x, coord_y):
-        return app.db_query(Building).filter_by(coord_x=coord_x, coord_y=coord_y)
+    def get_at(cls, coord_x, coord_y, city):
+        return app.db_query(Building).filter_by(coord_x=coord_x, coord_y=coord_y, city=city).one_or_none()

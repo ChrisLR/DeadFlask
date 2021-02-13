@@ -57,12 +57,12 @@ class Character(Base):
 
     @classmethod
     def get_at_building(cls, building, inside):
-        characters = app.db_query(Character).filter(
-            Character.coord_x == building.coord_x,
-            Character.coord_y == building.coord_y,
-            Character.city == building.city,
-            Character.type == CharacterType.id,
-            Character.is_inside == inside
+        characters = app.db_query(Character).filter_by(
+            coord_x=building.coord_x,
+            coord_y=building.coord_y,
+            city=building.city,
+            type=CharacterType.id,
+            is_inside=inside
         )
 
         return characters

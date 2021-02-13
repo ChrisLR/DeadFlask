@@ -35,8 +35,8 @@ def split_by_category(characters):
 
 
 def add_log(character, message, has_read=False, timestamp=None):
-    last_log = character.logs.query.order_by('-id').first()
-    if last_log.message == message:
+    last_log = character.logs[-1] if character.logs else None
+    if last_log and last_log.message == message:
         last_log.count += 1
         return last_log
 
